@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
@@ -11,6 +10,8 @@ import { RxCross1 } from "react-icons/rx";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 const AllUsers = () => {
   const dispatch = useDispatch();
@@ -24,46 +25,20 @@ const AllUsers = () => {
 
   const handleDelete = async (id) => {
     await axios
-    .delete(`${server}/user/delete-user/${id}`, { withCredentials: true })
-    .then((res) => {
-      toast.success(res.data.message);
-    });
+      .delete(`${server}/user/delete-user/${id}`, { withCredentials: true })
+      .then((res) => {
+        toast.success(res.data.message);
+      });
 
-  dispatch(getAllUsers());
+    dispatch(getAllUsers());
   };
 
   const columns = [
     { field: "id", headerName: "User ID", minWidth: 150, flex: 0.7 },
-
-    {
-      field: "name",
-      headerName: "name",
-      minWidth: 130,
-      flex: 0.7,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      type: "text",
-      minWidth: 130,
-      flex: 0.7,
-    },
-    {
-      field: "role",
-      headerName: "User Role",
-      type: "text",
-      minWidth: 130,
-      flex: 0.7,
-    },
-
-    {
-      field: "joinedAt",
-      headerName: "joinedAt",
-      type: "text",
-      minWidth: 130,
-      flex: 0.8,
-    },
-
+    { field: "name", headerName: "name", minWidth: 130, flex: 0.7 },
+    { field: "email", headerName: "Email", type: "text", minWidth: 130, flex: 0.7 },
+    { field: "role", headerName: "User Role", type: "text", minWidth: 130, flex: 0.7 },
+    { field: "joinedAt", headerName: "joinedAt", type: "text", minWidth: 130, flex: 0.8 },
     {
       field: " ",
       flex: 1,
@@ -95,6 +70,23 @@ const AllUsers = () => {
       });
     });
 
+  // Function to generate PDF
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.text("All Users Report", 14, 16);
+    doc.autoTable({
+      head: [["User ID", "Name", "Email", "Role", "Joined At"]],
+      body: row.map((user) => [
+        user.id,
+        user.name,
+        user.email,
+        user.role,
+        user.joinedAt,
+      ]),
+    });
+    doc.save("all_users_report.pdf");
+  };
+
   return (
     <div className="w-full flex justify-center pt-5">
       <div className="w-[97%]">
@@ -107,6 +99,15 @@ const AllUsers = () => {
             disableSelectionOnClick
             autoHeight
           />
+        </div>
+        <div className="w-full flex justify-end my-4">
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={generatePDF}
+          >
+            Generate PDF Report
+          </Button>
         </div>
         {open && (
           <div className="w-full fixed top-0 left-0 z-[999] bg-[#00000039] flex items-center justify-center h-screen">
@@ -126,7 +127,7 @@ const AllUsers = () => {
                 </div>
                 <div
                   className={`${styles.button} text-white text-[18px] !h-[42px] ml-4`}
-                  onClick={() =>  setOpen(false) || handleDelete(userId)}
+                  onClick={() => setOpen(false) || handleDelete(userId)}
                 >
                   confirm
                 </div>

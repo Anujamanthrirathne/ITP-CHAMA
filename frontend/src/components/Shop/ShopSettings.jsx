@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 
 const ShopSettings = () => {
   const { seller } = useSelector((state) => state.seller);
-  const [setAvatar] = useState();
+  const [avatar, setAvatar] = useState(null);
   const [name, setName] = useState(seller && seller.name);
   const [description, setDescription] = useState(
     seller && seller.description ? seller.description : ""
