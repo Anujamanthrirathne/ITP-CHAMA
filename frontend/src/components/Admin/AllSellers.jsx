@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
-import { Button } from "@mui/material";
+import { Button, TextField } from "@mui/material"; // Import TextField for search
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "../../styles/styles";
 import { RxCross1 } from "react-icons/rx";
@@ -10,19 +10,19 @@ import { server } from "../../server";
 import { toast } from "react-toastify";
 import { getAllSellers } from "../../redux/actions/seller";
 import { Link } from "react-router-dom";
-import jsPDF from "jspdf"; // Import jsPDF
+import jsPDF from "jspdf";
 
 const AllSellers = () => {
   const dispatch = useDispatch();
   const { sellers } = useSelector((state) => state.seller);
   const [open, setOpen] = useState(false);
   const [userId, setUserId] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // State to store the search query
 
   useEffect(() => {
     dispatch(getAllSellers());
   }, [dispatch]);
 
-  // Function to delete a seller
   const handleDelete = async (id) => {
     await axios
       .delete(`${server}/shop/delete-seller/${id}`, { withCredentials: true })
@@ -33,23 +33,17 @@ const AllSellers = () => {
     dispatch(getAllSellers());
   };
 
-  // Function to download a PDF for each seller
   const handleDownloadPDF = (seller) => {
     const doc = new jsPDF();
-
-    // Add seller details to the PDF
     doc.text(`Seller Report`, 10, 10);
     doc.text(`Seller ID: ${seller.id}`, 10, 20);
     doc.text(`Name: ${seller.name}`, 10, 30);
     doc.text(`Email: ${seller.email}`, 10, 40);
     doc.text(`Address: ${seller.address}`, 10, 50);
     doc.text(`Joined At: ${seller.joinedAt}`, 10, 60);
-
-    // Save the PDF
     doc.save(`seller_report_${seller.name}.pdf`);
   };
 
-  // Define table columns with a button to download individual seller PDF
   const columns = [
     { field: "id", headerName: "Seller ID", minWidth: 150, flex: 0.7 },
     { field: "name", headerName: "Name", minWidth: 130, flex: 0.7 },
@@ -96,28 +90,41 @@ const AllSellers = () => {
     },
   ];
 
+  // Filter sellers based on search query
+  const filteredSellers = sellers.filter((seller) =>
+    seller.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    seller.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // Prepare row data for the DataGrid
-  const row = [];
-  sellers &&
-    sellers.forEach((item) => {
-      row.push({
-        id: item._id,
-        name: item?.name,
-        email: item?.email,
-        joinedAt: item.createdAt.slice(0, 10),
-        address: item.address,
-      });
-    });
+  const rows = filteredSellers.map((item) => ({
+    id: item._id,
+    name: item?.name,
+    email: item?.email,
+    joinedAt: item.createdAt.slice(0, 10),
+    address: item.address,
+  }));
 
   return (
     <div className="w-full flex justify-center pt-5">
       <div className="w-[97%]">
-        <h3 className="text-[22px] font-Poppins pb-2">All Employee Details</h3>
+        <h3 className="text-[22px] font-Poppins pb-2">All Seller Details</h3>
+
+        {/* Search Bar */}
+        <div className="mb-4">
+          <TextField
+            label="Search Seller"
+            variant="outlined"
+            fullWidth
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
         <div className="w-full min-h-[45vh] bg-white rounded">
-          {/* The table displaying seller data */}
+          {/* DataGrid table */}
           <DataGrid
-            rows={row}
+            rows={rows}
             columns={columns}
             pageSize={10}
             disableSelectionOnClick
@@ -125,7 +132,7 @@ const AllSellers = () => {
           />
         </div>
 
-        {/* Confirmation modal for deleting a seller */}
+        {/* Delete confirmation modal */}
         {open && (
           <div className="w-full fixed top-0 left-0 z-[999] bg-[#00000039] flex items-center justify-center h-screen">
             <div className="w-[95%] 800px:w-[40%] min-h-[20vh] bg-white rounded shadow p-5">

@@ -9,6 +9,7 @@ import { server } from "../../server";
 import { toast } from "react-toastify";
 import { loadSeller } from "../../redux/actions/user";
 import { AiOutlineDelete } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const WithdrawMoney = () => {
   const [open, setOpen] = useState(false);
@@ -48,6 +49,7 @@ const WithdrawMoney = () => {
         `${server}/shop/update-payment-methods`,
         {
           withdrawMethod,
+         
         },
         { withCredentials: true }
       )
@@ -62,6 +64,7 @@ const WithdrawMoney = () => {
           bankHolderName: "",
           bankAddress: "",
         });
+        
       })
       .catch((error) => {
         console.log(error.response.data.message);
@@ -75,6 +78,7 @@ const WithdrawMoney = () => {
       })
       .then((res) => {
         toast.success("Withdraw method deleted successfully!");
+        window.location.reload();
         dispatch(loadSeller());
       });
   };
@@ -96,6 +100,7 @@ const WithdrawMoney = () => {
         )
         .then((res) => {
           toast.success("Withdraw money request is successful!");
+          window.location.reload();
         });
     }
   };

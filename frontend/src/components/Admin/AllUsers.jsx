@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { getAllUsers } from "../../redux/actions/user";
-import { Button } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { AiOutlineDelete, AiOutlineEye } from "react-icons/ai";
 import { DataGrid } from "@mui/x-data-grid";
 import styles from "../../styles/styles";
@@ -18,10 +18,24 @@ const AllUsers = () => {
   const { users } = useSelector((state) => state.user);
   const [open, setOpen] = useState(false);
   const [userId, setUserId] = useState("");
+  const [searchTerm, setSearchTerm] = useState(""); // New state for search term
+  const [filteredUsers, setFilteredUsers] = useState([]); // New state for filtered users
 
   useEffect(() => {
     dispatch(getAllUsers());
   }, [dispatch]);
+
+  useEffect(() => {
+    // Filter users based on the search term
+    if (searchTerm === "") {
+      setFilteredUsers(users);
+    } else {
+      const filtered = users.filter((user) =>
+        user.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredUsers(filtered);
+    }
+  }, [searchTerm, users]);
 
   const handleDelete = async (id) => {
     await axios
@@ -59,8 +73,8 @@ const AllUsers = () => {
   ];
 
   const row = [];
-  users &&
-    users.forEach((item) => {
+  filteredUsers &&
+    filteredUsers.forEach((item) => {
       row.push({
         id: item._id,
         name: item.name,
@@ -91,6 +105,17 @@ const AllUsers = () => {
     <div className="w-full flex justify-center pt-5">
       <div className="w-[97%]">
         <h3 className="text-[22px] font-Poppins pb-2">All Users</h3>
+        {/* Search Input */}
+        <div className="mb-4">
+          <TextField
+            label="Search by name"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
         <div className="w-full min-h-[45vh] bg-white rounded">
           <DataGrid
             rows={row}
@@ -123,13 +148,13 @@ const AllUsers = () => {
                   className={`${styles.button} text-white text-[18px] !h-[42px] mr-4`}
                   onClick={() => setOpen(false)}
                 >
-                  cancel
+                  Cancel
                 </div>
                 <div
                   className={`${styles.button} text-white text-[18px] !h-[42px] ml-4`}
                   onClick={() => setOpen(false) || handleDelete(userId)}
                 >
-                  confirm
+                  Confirm
                 </div>
               </div>
             </div>

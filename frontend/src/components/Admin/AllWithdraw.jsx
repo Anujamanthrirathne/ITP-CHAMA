@@ -1,5 +1,3 @@
-
-
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { server } from "../../server";
@@ -8,12 +6,14 @@ import { BsPencil } from "react-icons/bs";
 import { RxCross1 } from "react-icons/rx";
 import styles from "../../styles/styles";
 import { toast } from "react-toastify";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const AllWithdraw = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [withdrawData, setWithdrawData] = useState();
-  const [withdrawStatus,setWithdrawStatus] = useState('Processing');
+  const [withdrawStatus, setWithdrawStatus] = useState('Processing');
 
   useEffect(() => {
     axios
@@ -50,14 +50,14 @@ const AllWithdraw = () => {
     },
     {
       field: "status",
-      headerName: "status",
+      headerName: "Status",
       type: "text",
       minWidth: 80,
       flex: 0.5,
     },
     {
       field: "createdAt",
-      headerName: "Request given at",
+      headerName: "Request Given At",
       type: "number",
       minWidth: 130,
       flex: 0.6,
@@ -68,24 +68,21 @@ const AllWithdraw = () => {
       type: "number",
       minWidth: 130,
       flex: 0.6,
-      renderCell: (params) => {
-
-        return (
-          <BsPencil
-            size={20}
-            className={`${params.row.status !== "Processing" ? 'hidden' : '' } mr-5 cursor-pointer`}
-            onClick={() => setOpen(true) || setWithdrawData(params.row)}
-          />
-        );
-      },
+      renderCell: (params) => (
+        <BsPencil
+          size={20}
+          className={`${params.row.status !== "Processing" ? 'hidden' : ''} mr-5 cursor-pointer`}
+          onClick={() => setOpen(true) || setWithdrawData(params.row)}
+        />
+      ),
     },
   ];
 
   const handleSubmit = async () => {
     await axios
-      .put(`${server}/withdraw/update-withdraw-request/${withdrawData.id}`,{
+      .put(`${server}/withdraw/update-withdraw-request/${withdrawData.id}`, {
         sellerId: withdrawData.shopId,
-      },{withCredentials: true})
+      }, { withCredentials: true })
       .then((res) => {
         toast.success("Withdraw request updated successfully!");
         setData(res.data.withdraws);
@@ -95,17 +92,48 @@ const AllWithdraw = () => {
 
   const row = [];
 
-  data &&
-    data.forEach((item) => {
-      row.push({
-        id: item._id,
-        shopId: item.seller._id,
-        name: item.seller.name,
-        amount: "US$ " + item.amount,
-        status: item.status,
-        createdAt: item.createdAt.slice(0, 10),
-      });
+  data && data.forEach((item) => {
+    row.push({
+      id: item._id,
+      shopId: item.seller._id,
+      name: item.seller.name,
+      amount: "US$ " + item.amount,
+      status: item.status,
+      createdAt: item.createdAt.slice(0, 10),
     });
+  });
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+
+    doc.setFontSize(20);
+    doc.text("Withdraw Requests", 14, 22);
+
+    const pdfData = row.map((item) => ({
+      "Withdraw Id": item.id,
+      "Shop Name": item.name,
+      "Shop Id": item.shopId,
+      "Amount": item.amount,
+      "Status": item.status,
+      "Request Given At": item.createdAt,
+    }));
+
+    autoTable(doc, {
+      head: [["Withdraw Id", "Shop Name", "Shop Id", "Amount", "Status", "Request Given At"]],
+      body: pdfData.map((item) => [
+        item["Withdraw Id"],
+        item["Shop Name"],
+        item["Shop Id"],
+        item["Amount"],
+        item["Status"],
+        item["Request Given At"],
+      ]),
+      startY: 30,
+    });
+
+    doc.save("withdraw_requests.pdf");
+  };
+
   return (
     <div className="w-full flex items-center pt-5 justify-center">
       <div className="w-[95%] bg-white">
@@ -116,6 +144,12 @@ const AllWithdraw = () => {
           disableSelectionOnClick
           autoHeight
         />
+        <button
+          onClick={generatePDF}
+          className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+        >
+          Generate PDF
+        </button>
       </div>
       {open && (
         <div className="w-full fixed h-screen top-0 left-0 bg-[#00000031] z-[9999] flex items-center justify-center">
@@ -124,17 +158,15 @@ const AllWithdraw = () => {
               <RxCross1 size={25} onClick={() => setOpen(false)} />
             </div>
             <h1 className="text-[25px] text-center font-Poppins">
-              Update Withdraw status
+              Update Withdraw Status
             </h1>
             <br />
             <select
-              name=""
-              id=""
               onChange={(e) => setWithdrawStatus(e.target.value)}
               className="w-[200px] h-[35px] border rounded"
             >
               <option value={withdrawStatus}>{withdrawData.status}</option>
-              <option value={withdrawStatus}>Succeed</option>
+              <option value="Succeed">Succeed</option>
             </select>
             <button
               type="submit"
