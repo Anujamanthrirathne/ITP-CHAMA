@@ -105,34 +105,44 @@ const AllWithdraw = () => {
 
   const generatePDF = () => {
     const doc = new jsPDF();
-
+  
+    // Add Title
     doc.setFontSize(20);
-    doc.text("Withdraw Requests", 14, 22);
-
+    doc.text("Withdraw Requests Report", 14, 22);
+  
+    // Extract meaningful data for the PDF, excluding unnecessary fields like MongoDB ids
     const pdfData = row.map((item) => ({
-      "Withdraw Id": item.id,
       "Shop Name": item.name,
-      "Shop Id": item.shopId,
       "Amount": item.amount,
       "Status": item.status,
       "Request Given At": item.createdAt,
     }));
-
+  
+    // Use jsPDF autoTable to create a well-formatted table
     autoTable(doc, {
-      head: [["Withdraw Id", "Shop Name", "Shop Id", "Amount", "Status", "Request Given At"]],
+      head: [["Shop Name", "Amount", "Status", "Request Given At"]], // New column headers
       body: pdfData.map((item) => [
-        item["Withdraw Id"],
         item["Shop Name"],
-        item["Shop Id"],
         item["Amount"],
         item["Status"],
         item["Request Given At"],
       ]),
-      startY: 30,
+      startY: 30, // To ensure the table is placed below the title
+      theme: "grid", // Optional: gives the table a clean grid look
+      styles: {
+        fontSize: 10, // Optional: adjust to fit the page better
+      },
+      headStyles: {
+        fillColor: [41, 128, 185], // Optional: customize table header color (blue in this case)
+        textColor: [255, 255, 255], // Header text in white
+      },
+      margin: { top: 10 },
     });
-
-    doc.save("withdraw_requests.pdf");
+  
+    // Save the generated PDF with a proper filename
+    doc.save("Withdraw_Requests_Report.pdf");
   };
+  
 
   return (
     <div className="w-full flex items-center pt-5 justify-center">

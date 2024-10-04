@@ -10,7 +10,7 @@ import { server } from "../../server";
 import { toast } from "react-toastify";
 import { getAllSellers } from "../../redux/actions/seller";
 import { Link } from "react-router-dom";
-import jsPDF from "jspdf";
+import jsPDF from "jspdf"
 
 const AllSellers = () => {
   const dispatch = useDispatch();
@@ -35,15 +35,42 @@ const AllSellers = () => {
 
   const handleDownloadPDF = (seller) => {
     const doc = new jsPDF();
-    doc.text(`Seller Report`, 10, 10);
-    doc.text(`Seller ID: ${seller.id}`, 10, 20);
-    doc.text(`Name: ${seller.name}`, 10, 30);
-    doc.text(`Email: ${seller.email}`, 10, 40);
-    doc.text(`Address: ${seller.address}`, 10, 50);
-    doc.text(`Joined At: ${seller.joinedAt}`, 10, 60);
+  
+    // Add custom title and basic seller details
+    doc.setFontSize(22);
+    doc.text("Seller Report", 14, 20);
+  
+    doc.setFontSize(14);
+    doc.text(`Seller Name: ${seller.name}`, 14, 40);
+    doc.text(`Email: ${seller.email}`, 14, 50);
+    doc.text(`Address: ${seller.address || "N/A"}`, 14, 60);
+    doc.text(`Joined At: ${seller.joinedAt}`, 14, 70);
+  
+    // Add a styled table for additional seller details (if any)
+    doc.autoTable({
+      startY: 80,
+      head: [["Field", "Details"]],
+      body: [
+        ["Name", seller.name],
+        ["Email", seller.email],
+        ["Address", seller.address || "N/A"],
+        ["Joined At", seller.joinedAt],
+        // Add more rows if needed
+      ],
+      theme: "grid",
+      styles: { fontSize: 12, cellPadding: 3 },
+      headStyles: { fillColor: [22, 160, 133] },  // Custom header color
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+    });
+  
+    // Footer or additional notes section
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, doc.internal.pageSize.height - 10);
+  
+    // Save the PDF with a clean filename
     doc.save(`seller_report_${seller.name}.pdf`);
   };
-
+  
   const columns = [
     { field: "id", headerName: "Seller ID", minWidth: 150, flex: 0.7 },
     { field: "name", headerName: "Name", minWidth: 130, flex: 0.7 },

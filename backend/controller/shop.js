@@ -1,4 +1,3 @@
-
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -13,6 +12,7 @@ const sendShopToken = require("../utils/shopToken");
 const { isAuthenticated, isSeller, isAdmin } = require("../middleware/auth");
 
 const router = express.Router();
+
 
 // Create a shop
 router.post(
@@ -55,7 +55,7 @@ router.post(
     };
 
     const activationToken = createActivationToken(shopData);
-    const activationUrl = `https://chama-itp-advanced-e-shop-4fzm.vercel.app/activation/${activationToken}`;
+    const activationUrl = `http://localhost:3000/seller/activation/${activationToken}`;
 
     try {
       await sendMail({
@@ -126,6 +126,7 @@ router.post(
     }
   })
 );
+
 
 // login shop
 router.post(

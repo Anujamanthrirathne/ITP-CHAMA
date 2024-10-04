@@ -87,19 +87,32 @@ const AllUsers = () => {
   // Function to generate PDF
   const generatePDF = () => {
     const doc = new jsPDF();
-    doc.text("All Users Report", 14, 16);
+  
+    
+    // Add title
+    doc.setFontSize(18);
+    doc.text("All Users Report", 14, 40);
+  
+    // AutoTable for user data
     doc.autoTable({
-      head: [["User ID", "Name", "Email", "Role", "Joined At"]],
+      startY: 50,
+      head: [["Name", "Email", "Role", "Joined At"]],
       body: row.map((user) => [
-        user.id,
         user.name,
         user.email,
         user.role,
         user.joinedAt,
       ]),
+      theme: "grid",
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [22, 160, 133] },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
     });
+  
+    // Save the PDF
     doc.save("all_users_report.pdf");
   };
+  
 
   return (
     <div className="w-full flex justify-center pt-5">

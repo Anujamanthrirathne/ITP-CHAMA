@@ -101,7 +101,13 @@ const CreateEvent = () => {
             name="name"
             value={name}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow only letters and spaces, disallow numbers
+              if (/^[a-zA-Z\s]*$/.test(value)) {
+                setName(value);
+              }
+            }}
             placeholder="Enter your Event product name..."
           />
         </div>
@@ -117,7 +123,13 @@ const CreateEvent = () => {
             name="description"
             value={description}
             className="mt-2 appearance-none block w-full pt-2 px-3 border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow only letters and spaces, disallow numbers
+              if (/^[a-zA-Z\s]*$/.test(value)) {
+                setDescription(value);
+              }
+            }}
             placeholder="Enter your Event product description..."
           ></textarea>
         </div>
@@ -236,14 +248,15 @@ const CreateEvent = () => {
             <label htmlFor="upload">
               <AiOutlinePlusCircle size={30} className="mt-3" color="#555" />
             </label>
-            {images && Array.from(images).map((file, index) => (
-              <img
-                src={URL.createObjectURL(file)}
-                key={index}
-                alt=""
-                className="h-[120px] w-[120px] object-cover m-2"
-              />
-            ))}
+            {images &&
+              Array.from(images).map((file, index) => (
+                <img
+                  src={URL.createObjectURL(file)}
+                  key={index}
+                  alt=""
+                  className="h-[120px] w-[120px] object-cover m-2"
+                />
+              ))}
           </div>
           <br />
           <div>

@@ -26,7 +26,7 @@ const ShopCreate = () => {
     e.preventDefault();
 
     if (!validatePassword(password)) {
-      toast.error("Password should be at least 6 characters long.");
+      toast.error("Password should be at least 5 characters long.");
       return;
     }
 
@@ -42,9 +42,13 @@ const ShopCreate = () => {
     }
 
     try {
-      const response = await axios.post(`${server}/shop/create-shop`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await axios.post(
+        `${server}/shop/create-shop`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       toast.success(response.data.message);
       // Reset form fields
       setName("");
@@ -86,7 +90,10 @@ const ShopCreate = () => {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="name"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Shop Name
               </label>
               <div className="mt-1">
@@ -96,14 +103,22 @@ const ShopCreate = () => {
                   name="name"
                   required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    const regex = /^[A-Za-z\s]*$/; // Allow only letters and spaces
+                    if (regex.test(e.target.value)) {
+                      setName(e.target.value);
+                    }
+                  }}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="phoneNumber"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Phone Number
               </label>
               <div className="mt-1">
@@ -113,14 +128,23 @@ const ShopCreate = () => {
                   name="phoneNumber"
                   required
                   value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // Allow only numbers and limit to 10 digits
+                    if (/^\d*$/.test(value) && value.length <= 10) {
+                      setPhoneNumber(value);
+                    }
+                  }}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <div className="mt-1">
@@ -138,7 +162,10 @@ const ShopCreate = () => {
             </div>
 
             <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Address
               </label>
               <div className="mt-1">
@@ -155,7 +182,10 @@ const ShopCreate = () => {
             </div>
 
             <div>
-              <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="zipCode"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Zip Code
               </label>
               <div className="mt-1">
@@ -172,7 +202,10 @@ const ShopCreate = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1 relative">
@@ -203,7 +236,10 @@ const ShopCreate = () => {
             </div>
 
             <div>
-              <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="avatar"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Shop Avatar
               </label>
               <div className="mt-2 flex items-center">

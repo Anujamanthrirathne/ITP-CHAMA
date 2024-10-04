@@ -34,7 +34,7 @@ const CreateProduct = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setImages(files); 
+    setImages(files);
   };
 
   const handleSubmit = (e) => {
@@ -72,7 +72,13 @@ const CreateProduct = () => {
             name="name"
             value={name}
             className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Regex to allow only letters, spaces, and prevent numbers
+              if (/^[a-zA-Z\s]*$/.test(value)) {
+                setName(value);
+              }
+            }}
             placeholder="Enter your product name..."
           />
         </div>
@@ -88,10 +94,17 @@ const CreateProduct = () => {
             name="description"
             value={description}
             className="mt-2 appearance-none block w-full pt-2 px-3 border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Regex to allow only letters and spaces (no numbers or special characters)
+              if (/^[a-zA-Z\s]*$/.test(value)) {
+                setDescription(value);
+              }
+            }}
             placeholder="Enter your product description..."
           ></textarea>
         </div>
+
         <br />
         <div>
           <label className="pb-2">
@@ -179,14 +192,15 @@ const CreateProduct = () => {
             <label htmlFor="upload">
               <AiOutlinePlusCircle size={30} className="mt-3" color="#555" />
             </label>
-            {images && Array.from(images).map((file, index) => (
-              <img
-                src={URL.createObjectURL(file)}
-                key={index}
-                alt=""
-                className="h-[120px] w-[120px] object-cover m-2"
-              />
-            ))}
+            {images &&
+              Array.from(images).map((file, index) => (
+                <img
+                  src={URL.createObjectURL(file)}
+                  key={index}
+                  alt=""
+                  className="h-[120px] w-[120px] object-cover m-2"
+                />
+              ))}
           </div>
           <br />
           <div>

@@ -40,11 +40,13 @@ const ProfileContent = ({ active }) => {
     }
   }, [error, SuccessMessage, dispatch]);
 
+  //edit profile
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(updateUserInformation({ email, password, phoneNumber, name }));
   };
 
+  //image edit
   const handleImage = async (e) => {
     const file = e.target.files[0]; // Correctly get the file
     setAvatar(file); // Set the selected avatar
@@ -587,7 +589,7 @@ const Address = () => {
             <div className="w-full flex justify-end p-3">
               <RxCross1
                 size={30}
-                className="cursor-pointer"
+                className="cursor-pointer "
                 onClick={() => setOpen(false)}
               />
             </div>
@@ -753,7 +755,7 @@ const Address = () => {
             <div className="min-w[10%] flex items-center justify-between pl-8">
               <AiOutlineDelete
                 size={25}
-                className="cursor-pointer"
+                className="cursor-pointer "
                 onClick={() => handleDelete(item)}
               />
             </div>

@@ -63,16 +63,56 @@ const OrderDetails = () => {
   };
 
   const generatePDF = async () => {
-    if (printRef.current) {
+    if (printRef.current && data) {
       const doc = new jsPDF();
-      const canvas = await html2canvas(printRef.current);
-      const imgData = canvas.toDataURL("image/png");
-      doc.addImage(imgData, "PNG", 10, 10, 190, 0); // Adjust dimensions as needed
-      doc.save("order-details.pdf");
+  
+      // Set title and font styles
+      doc.setFontSize(22);
+      doc.text("Order Details Report", 14, 20);
+      
+      doc.setFontSize(14);
+      doc.text(`Order ID: ${data._id.slice(0, 8)}`, 14, 40);
+      doc.text(`Order Date: ${data.createdAt?.slice(0, 10)}`, 14, 50);
+      doc.text(`Total Price: US$${data.totalPrice}`, 14, 60);
+  
+      // Add Shipping Details
+      doc.setFontSize(18);
+      doc.text("Shipping Information", 14, 80);
+      
+      doc.setFontSize(14);
+      doc.text(`Name: ${data.user?.name}`, 14, 90);
+      doc.text(`Address: ${data.shippingAddress.address1} ${data.shippingAddress.address2}`, 14, 100);
+      doc.text(`City: ${data.shippingAddress.city}`, 14, 110);
+      doc.text(`Country: ${data.shippingAddress.country}`, 14, 120);
+      doc.text(`Phone: ${data.user?.phoneNumber}`, 14, 130);
+  
+      // Add Payment Details
+      doc.setFontSize(18);
+      doc.text("Payment Information", 14, 150);
+  
+      doc.setFontSize(14);
+      doc.text(`Status: ${data.paymentInfo?.status ? data.paymentInfo?.status : "Not Paid"}`, 14, 160);
+      
+      // Add Order Items
+      doc.setFontSize(18);
+      doc.text("Order Items", 14, 180);
+      
+      data.cart.forEach((item, index) => {
+        doc.setFontSize(14);
+        doc.text(`${index + 1}. ${item.name} - US$${item.discountPrice} x ${item.qty}`, 14, 190 + index * 10);
+      });
+  
+      // Footer with date and time
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 14, doc.internal.pageSize.height - 10);
+  
+      // Save the PDF
+      doc.save(`order-details-${data._id.slice(0, 8)}.pdf`);
     } else {
       toast.error("Unable to generate PDF, please try again.");
     }
   };
+  
 
   return (
     <div className={`py-4 min-h-screen ${styles.section}`} ref={printRef}>
